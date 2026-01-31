@@ -1,0 +1,256 @@
+/* =====================
+   Brand theme (yellow)
+===================== */
+
+:root {
+  --bg-yellow: #fbf3d6;
+  --panel-yellow: #fff7dd;
+  --user-yellow: #f2cf63;
+
+  --bot-bg: #ffffff;
+  --bot-border: #ececec;
+
+  --border-yellow: #ecdca3;
+
+  --text-main: #1c1c1c;
+  --text-muted: #6b6b6b;
+}
+
+/* =====================
+   Base
+===================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-yellow);
+  color: var(--text-main);
+}
+
+/* =====================
+   Layout
+===================== */
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+}
+
+.header {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+/* =====================
+   Chat wrapper
+===================== */
+
+.chat-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  background: var(--panel-yellow);
+  border-radius: 18px;
+  border: 1px solid var(--border-yellow);
+}
+
+/* =====================
+   Chat area
+===================== */
+
+.chat {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  scroll-behavior: smooth;
+}
+
+/* =====================
+   Messages
+===================== */
+
+.message {
+  max-width: 75%;
+  display: flex;
+  flex-direction: column;
+  animation: messageIn 0.25s ease-out both;
+}
+
+.message.user {
+  align-self: flex-end;
+  text-align: right;
+}
+
+.message.bot {
+  align-self: flex-start;
+  text-align: left;
+}
+
+.message .role {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+/* =====================
+   Message bubbles
+===================== */
+
+.message .content {
+  padding: 12px 14px;
+  font-size: 15px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* User bubble */
+.message.user .content {
+  background: var(--user-yellow);
+  border-radius: 18px 18px 4px 18px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Bot bubble (iMessage style) */
+.message.bot .content {
+  background: var(--bot-bg);
+  border-radius: 18px 18px 18px 4px;
+  border: 1px solid var(--bot-border);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+/* Hover lift = subtle delight */
+.message .content:hover {
+  transform: translateY(-1px);
+}
+
+/* =====================
+   Typing indicator
+===================== */
+
+.typing {
+  display: inline-flex;
+  gap: 6px;
+  padding: 6px 2px;
+}
+
+.typing span {
+  width: 6px;
+  height: 6px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  animation: typingPulse 1.4s infinite ease-in-out;
+}
+
+.typing span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* =====================
+   Input + Send button
+===================== */
+
+.input {
+  margin-top: 14px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 14px 52px 14px 16px;
+  font-size: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border-yellow);
+  outline: none;
+  background: #fffdf4;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-wrapper input:focus {
+  border-color: #e1c24f;
+  box-shadow: 0 0 0 3px rgba(242, 207, 99, 0.25);
+}
+
+/* Send arrow (ChatGPT-like) */
+#sendBtn {
+  position: absolute;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: var(--user-yellow);
+  color: #1c1c1c;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+#sendBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+}
+
+#sendBtn:active {
+  transform: scale(0.95);
+}
+
+#sendBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* =====================
+   Animations
+===================== */
+
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes typingPulse {
+  0% {
+    opacity: 0.3;
+    transform: scale(0.9);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(0.9);
+  }
+}
