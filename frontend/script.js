@@ -1,18 +1,7 @@
-// -------------------
-// DOM Elements
-// -------------------
 const chat = document.getElementById("chat")
 const input = document.getElementById("input")
-const sendBtn = document.getElementById("sendBtn")
 
 const API_URL = "http://localhost:8000/chat"
-
-// -------------------
-// Safety check
-// -------------------
-if (!chat || !input || !sendBtn) {
-  console.error("❌ Required DOM elements not found")
-}
 
 // -------------------
 // Helpers
@@ -37,8 +26,6 @@ function addMessage(role, text) {
 }
 
 function addTypingIndicator() {
-  if (document.getElementById("typing")) return
-
   const wrapper = document.createElement("div")
   wrapper.className = "message bot"
   wrapper.id = "typing"
@@ -61,63 +48,38 @@ function removeTypingIndicator() {
   if (el) el.remove()
 }
 
-function setSending(isSending) {
-  sendBtn.disabled = isSending
-  input.disabled = isSending
-}
-
 // -------------------
-// Core send logic
+// Events
 // -------------------
-async function sendMessage() {
-  const question = input.value.trim()
-  if (!question) return
+input.addEventListener("keydown", async (e) => {
+  if (e.key !== "Enter" || !input.value.trim()) return
 
+  const question = input.value
   input.value = ""
-  setSending(true)
 
   addMessage("user", question)
   addTypingIndicator()
-
-  // Allow UI to paint typing dots
-  await new Promise((r) => setTimeout(r, 200))
-
+  
+  // ⬇️ Allow browser to render typing dots
+  await new Promise((r) => setTimeout(r, 150))
+  
   try {
     const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question }),
     })
-
-    if (!res.ok) {
-      throw new Error(`HTTP error ${res.status}`)
-    }
-
+  
     const data = await res.json()
-
-    // Minimum typing delay (feels human)
+  
+    // ⬇️ Optional minimum typing time (feels human)
     await new Promise((r) => setTimeout(r, 400))
-
+  
     removeTypingIndicator()
     addMessage("bot", data.answer)
   } catch (err) {
-    console.error("❌ Chat error:", err)
+    console.error(err)
     removeTypingIndicator()
-    addMessage("bot", "Something went wrong. Please try again.")
-  } finally {
-    setSending(false)
-    input.focus()
-  }
-}
-
-// -------------------
-// Events
-// -------------------
-input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault()
-    sendMessage()
+    addMessage("bot", "Something went wrong.")
   }
 })
-
-sendBtn.addEventListener("click", sendMessage)
