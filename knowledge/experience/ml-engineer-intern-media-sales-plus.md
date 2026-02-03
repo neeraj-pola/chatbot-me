@@ -1,6 +1,6 @@
 ## Role: Machine Learning Engineer Intern  
 Company: Media Sales Plus  
-Duration: Aug 2025 – Dec 2025
+Duration: started on Aug 2025 – ended on Dec 2025
 
 ### Context
 Worked on production NLP systems used to automate and scale editorial and analytics workflows.

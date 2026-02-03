@@ -1,6 +1,6 @@
 ## Role: Artificial Intelligence Intern  
 Organization: Center for Artificial Intelligence and Robotics (DRDO)  
-Duration: Oct 2023 – Mar 2024
+Duration: started on Oct 2023 – ended on Mar 2024
 
 ### Context
 Worked on speech recognition systems for low-resource Indian languages under research constraints.

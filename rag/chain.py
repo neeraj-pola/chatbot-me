@@ -2,52 +2,90 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from operator import itemgetter
+from pathlib import Path
 
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableLambda
 
 from rag.persona import load_persona
 from rag.retriever import load_retriever
 
 
+# --------------------
+# Load long-term bio
+# --------------------
+def load_bio_context() -> str:
+    """
+    Loads all personal/background markdown files.
+    Injected as long-term memory.
+    """
+    bio_dir = Path("knowledge/bio")
+    parts = []
+
+    if bio_dir.exists():
+        for file in sorted(bio_dir.glob("*.md")):
+            parts.append(file.read_text())
+
+    return "\n\n".join(parts) if parts else ""
+
+
+# --------------------
+# Build RAG chain
+# --------------------
 def build_rag_chain():
     persona = load_persona()
-    retriever = load_retriever(k=4)
+    retriever = load_retriever(k=6)
+    bio_context = load_bio_context()
 
     llm = ChatOpenAI(
         model="gpt-4o-mini",
-        temperature=0.3,
-        streaming=True,  # enabled, but not used yet
+        temperature=0.6,
+        streaming=True,
     )
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", persona),
         ("system", "Conversation so far:\n{chat_history}"),
-        ("human", """
-Context:
+        (
+            "human",
+            """Context:
 {context}
 
 Question:
-{question}
-"""),
+{question}"""
+        ),
     ])
 
+    # -------- Format retrieved docs (ONE pass) --------
     def format_docs(docs):
-        if not docs:
-            return "No relevant context found."
-        return "\n\n".join(doc.page_content for doc in docs)
+        retrieved_text = "\n\n".join(doc.page_content for doc in docs) if docs else ""
+        return {
+            "context": f"""
+=== PERSONAL BACKGROUND (use ONLY if relevant) ===
+{bio_context}
+
+=== RETRIEVED CONTEXT ===
+{retrieved_text}
+""",
+            "retrieved_chunks_count": len(docs) if docs else 0,
+        }
+
+    format_docs_runnable = RunnableLambda(format_docs)
 
     rag_chain = (
         {
-            # 🔑 ONLY pass question to retriever
-            "context": itemgetter("question") | retriever | format_docs,
-
-            # These pass through untouched
+            "retrieval": itemgetter("question") | retriever,
             "question": itemgetter("question"),
             "chat_history": itemgetter("chat_history"),
         }
+        | RunnableLambda(
+            lambda x: {
+                **x,
+                **format_docs(x["retrieval"]),
+            }
+        )
         | prompt
         | llm
         | StrOutputParser()

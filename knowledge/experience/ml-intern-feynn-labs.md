@@ -1,6 +1,6 @@
 ## Role: Machine Learning Intern  
 Company: Feynn Labs  
-Duration: Mar 2023 – May 2023
+Duration:started on  Mar 2023 – ended on May 2023
 
 ### Context
 Worked on data-driven forecasting and analytics for business decision support.
